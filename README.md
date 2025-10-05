@@ -82,7 +82,38 @@ input-{userId}/thumbnails/<name>_thumbnail.png
 ### 🔹 UI (`/ui`)
 
 - Angular + Tailwind.
-- Authenticated upload to API, list folders/files, show thumbnails when available.
+
+## UI uploads, folder placement & thumbnails
+
+**How uploads work (from the Angular UI)**  
+1. User selects a file in the UI.  
+2. UI sends the file as `multipart/form-data` to **`POST /api/UploadEncodeAndStreamFiles/upload-file`** (JWT required).  
+   - The API streams the file to Azure Blob Storage at `input-{userId}/<filename>` and returns the `azureUrl`.  
+3. UI then creates/updates the DB record via **`POST /api/MediaItems/create-media-item`**, passing metadata like `name`, `type`, `mediaType`, `folderId` (if any), and the returned `azureUrl`.
+
+**Putting files inside folders**  
+- Folders are **DB-only** (virtual). Creating a folder inserts a row with `type="folder"`.  
+- When the UI uploads a file “into” a folder, it simply sets **`folderId`** on the media item to the folder’s DB `Id`.  
+- No directories are created in Blob Storage; the hierarchy is maintained entirely in the database.
+
+**Thumbnails in the UI (videos)**  
+- After a video is uploaded, Azure **Event Grid** triggers the Function: it downloads the blob, runs **FFmpeg**, uploads a thumbnail to  
+  `input-{userId}/thumbnails/<name>_thumbnail.png`, and calls  
+  **`POST /api/MediaItems/add-media-item-thumbnail`** to store `ThumbnailUrl` in the same DB row as the video.  
+- The UI uses **`GET /api/MediaItems/get-media-items?id=<folderId|null>`** to list items; for videos it reads **`ThumbnailUrl`** from the DB and renders that image (fast preview).  
+  The original `azureUrl` is used only when the user opens/plays the asset—**saving client compute and time**.
+
+
+## Folder structure & hierarchy (DB-driven)
+
+- **Folders are virtual (DB only):** When a folder is created, **no container or blob “folder” is created**. A **DB row** with `type="folder"` is inserted instead.
+- **Parent/child relationship:** Files and folders store `folderId` pointing to their parent folder’s DB `Id`. This builds a **hierarchical tree** entirely in the database.
+- **Browsing & breadcrumbs:** `GET /api/MediaItems/get-media-items?id=<folderId|null>` returns the child items plus a computed `path` by traversing `folderId` parents—used by the UI for breadcrumbs.
+- **Benefits:**
+  - Keeps Azure Storage **flat and simple**; avoids empty directory artifacts.
+  - **Fast renames/moves**: update DB metadata without copying blobs.
+  - Enforces **per-directory uniqueness** via API validation (no duplicate names).
+- **Deletion:** Deleting a file removes its blob (and video thumbnail) from storage and the DB row. Deleting a folder removes its **hierarchy in DB** (and associated blobs for contained files, per API/trigger logic).
 
 ---
 

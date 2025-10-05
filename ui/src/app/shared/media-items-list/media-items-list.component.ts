@@ -5,7 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { ContextMenuComponent, ContextMenuService } from '@perfectmemory/ngx-contextmenu';
 import { MatDialog } from '@angular/material/dialog';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import {
     MatSnackBar,
     MatSnackBarHorizontalPosition,
@@ -176,7 +176,7 @@ export class MediaItemListViewComponent implements OnInit, OnDestroy
                 }
             });
             dialogRef.afterClosed().subscribe((result) => {
-            const form: FormGroup = result;
+            const form: UntypedFormGroup = result;
             if(form.value) {
             this.createNewItem(
                 form.value.folderName,

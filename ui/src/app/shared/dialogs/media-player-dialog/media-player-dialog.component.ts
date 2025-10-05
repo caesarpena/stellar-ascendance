@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, NgForm, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MediaPlayerDialogData } from './mediaPlayer-dialog-data';
 
@@ -10,9 +10,9 @@ import { MediaPlayerDialogData } from './mediaPlayer-dialog-data';
 })
 export class MediaPlayerDialogComponent implements OnInit, OnDestroy {
     @ViewChild('newFolderNgForm') newFolderNgForm: NgForm;
-    newFolderForm: FormGroup;
+    newFolderForm: UntypedFormGroup;
 
-    constructor(private _formBuilder: FormBuilder,
+    constructor(private _formBuilder: UntypedFormBuilder,
         public dialogRef: MatDialogRef<MediaPlayerDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: MediaPlayerDialogData,
       ) {}

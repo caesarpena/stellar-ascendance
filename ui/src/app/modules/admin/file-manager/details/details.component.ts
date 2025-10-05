@@ -9,7 +9,7 @@ import { MediaPlayerDialogComponent } from 'app/shared/dialogs/media-player-dial
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, NgForm, Validators } from '@angular/forms';
 
 @Component({
     selector       : 'file-manager-details',
@@ -20,7 +20,7 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 export class FileManagerDetailsComponent implements OnInit, OnDestroy
 {
     @ViewChild('mediaItemNgForm') mediaItemNgForm: NgForm;
-    mediaItemForm: FormGroup;
+    mediaItemForm: UntypedFormGroup;
     mediaItem: MediaItem;
     isLoading: boolean = false;
     isEditMode: boolean = false;
@@ -36,7 +36,7 @@ export class FileManagerDetailsComponent implements OnInit, OnDestroy
         private _fuseConfirmationService: FuseConfirmationService,
         private _snackBar: MatSnackBar,
         private _router: Router,
-        private _formBuilder: FormBuilder,
+        private _formBuilder: UntypedFormBuilder,
         private _activatedRoute: ActivatedRoute,
         public dialog: MatDialog,
     )

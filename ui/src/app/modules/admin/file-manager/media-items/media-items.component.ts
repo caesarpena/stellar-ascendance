@@ -7,7 +7,7 @@ import { FileManagerService } from '../file-manager.service';
 import { IMediaItem, MediaItem, MediaItems } from '../file-manager.types';
 import { ContextMenuComponent, ContextMenuService } from '@perfectmemory/ngx-contextmenu';
 import { MatDialog } from '@angular/material/dialog';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import {
     MatSnackBar,
     MatSnackBarHorizontalPosition,
@@ -191,7 +191,7 @@ export class MediaItemListComponent implements OnInit, OnDestroy
                 }
             });
             dialogRef.afterClosed().subscribe((result) => {
-                const form: FormGroup = result;
+                const form: UntypedFormGroup = result;
               if(form.value) {
                 const currentDate = new Date();
                 this.createNewItem(

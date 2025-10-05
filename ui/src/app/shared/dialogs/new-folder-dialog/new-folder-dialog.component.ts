@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, NgForm, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { NewFolderDialogData } from './new-folder-dialogData';
 
@@ -10,9 +10,9 @@ import { NewFolderDialogData } from './new-folder-dialogData';
 })
 export class NewFolderDialogComponent implements OnInit, OnDestroy {
     @ViewChild('newFolderNgForm') newFolderNgForm: NgForm;
-    newFolderForm: FormGroup;
+    newFolderForm: UntypedFormGroup;
 
-    constructor(private _formBuilder: FormBuilder,
+    constructor(private _formBuilder: UntypedFormBuilder,
         public dialogRef: MatDialogRef<NewFolderDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: NewFolderDialogData,
       ) {}

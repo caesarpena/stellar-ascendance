@@ -51,7 +51,7 @@ namespace FunctionApp1
 
                     if (components != null)
                     {
-                        string azureUrl = components.AzureUrl; // https://azurefitstorage.blob.core.windows.net
+                        string azureUrl = components.AzureUrl;
                         string containerName = components.Container; // input-8feeed44-228c-4498-af80-5e9222470462
 
                         // Replace invalid characters in directory and name with underscores
@@ -132,7 +132,8 @@ namespace FunctionApp1
 
                                                     using (var client = new HttpClient())
                                                     {
-                                                        var postUrl = "https://ec61-209-122-222-148.ngrok-free.app/api/MediaItems/add-media-item-thumbnail";
+                                                        var baseUrl = Environment.GetEnvironmentVariable("WebApiBaseUrl"); // e.g. https://yourapi.example.com
+                                                        var postUrl = $"{baseUrl}/api/MediaItems/add-media-item-thumbnail";
                                                         var apiKey = Environment.GetEnvironmentVariable("WebApiKey");
                                                         
                                                         var postData = new

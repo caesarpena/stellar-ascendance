@@ -1,6 +1,6 @@
 export const API_UTILS = {
   config: {
-    base: 'yourapiurl/api',
+    base: 'https://webapi-app-20251001090144.ashymoss-a0eabe61.eastus.azurecontainerapps.io/api',
     internalApp: {
         getFitnessCategories:'/InternalApp/get-fitness-categories',
         getFitnessSubCategoriesByCatId:'/InternalApp/get-fitness-sub-categories-by-catId',

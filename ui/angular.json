@@ -5,11 +5,12 @@
         "defaultCollection": "@angular-eslint/schematics",
         "cache": {
             "enabled": false
-        }
+        },
+        "analytics": "b0563521-7c23-4cb4-8507-89b64ff2e117"
     },
     "newProjectRoot": "projects",
     "projects": {
-        "fuse": {
+        "stellar-ascendance-ui": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {

@@ -1,0 +1,20 @@
+<vg-player>
+    <vg-controls>
+        <vg-play-pause vgFor="masterVideo"></vg-play-pause>
+
+        <vg-scrub-bar vgFor="masterVideo">
+            <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+            <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
+        </vg-scrub-bar>
+
+        <vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display>
+
+        <vg-mute vgFor="masterVideo"></vg-mute>
+
+        <vg-fullscreen vgFor="masterVideo"></vg-fullscreen>
+    </vg-controls>
+
+    <video [vgMedia]="master" #master [vgMaster]="true" id="masterVideo" preload="auto">
+        <source [src]="url" type="video/mp4">
+    </video>
+</vg-player>

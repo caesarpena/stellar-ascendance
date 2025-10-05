@@ -1,0 +1,15 @@
+<mat-dialog-content class="mat-typography">
+    <div class="flex flex-col items-center justify-center flex-auto dark:bg-transparent" style="height: 200px;">
+        <mat-icon
+            class="icon-size-24"
+            [svgIcon]="'heroicons_outline:exclamation-circle'">
+        </mat-icon>
+        <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">Are you sure?</div>
+        <p>All the dependent items will be deleted as well!</p>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
+</mat-dialog-actions>
+

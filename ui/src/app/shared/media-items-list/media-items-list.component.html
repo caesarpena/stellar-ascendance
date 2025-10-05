@@ -1,0 +1,165 @@
+    <!-- Main -->
+<div class="flex flex-col flex-auto">
+    <!-- Header -->
+    <div class="mt-0.5 font-medium text-secondary">
+        <ng-container *ngIf="mediaItems">
+            <div *ngIf="mediaItems.folders || mediaItems.files">
+                {{mediaItems.folders.length}} folders, {{mediaItems.files.length}} files
+            </div>
+        </ng-container>
+        <!-- Breadcrumbs -->
+        <ng-container *ngIf="mediaItems">
+            <div class="flex items-center space-x-2">
+                <a *ngIf="mediaItems.path.length"
+                    class="cursor-pointer text-primary"
+                    (click)="routeToHome()">Home
+                </a>
+                <div *ngIf="mediaItems.path.length" class="">/</div>
+                <ng-container *ngFor="let path of mediaItems.path; let last = last; trackBy: trackByFn">
+                    <ng-container *ngIf="!last">
+                        <a
+                            class="cursor-pointer text-primary"
+                            (click)="itemClick(path)">{{path.name}}</a>
+                    </ng-container>
+                    <ng-container *ngIf="last">
+                        <div>{{path.name}}</div>
+                    </ng-container>
+                    <ng-container *ngIf="!last">
+                        <div class="">/</div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </ng-container>
+    </div>
+    <div class="flex flex-col items-start p-6 border-b sm:flex-row sm:items-center sm:justify-between sm:py-12 md:px-8 bg-card dark:bg-transparent">
+        <!-- Actions -->
+        <div class="mt-4 sm:mt-0">
+            <!-- Upload button -->
+            <button
+                mat-flat-button
+                color="primary"
+                (click)="openFileDialog()">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2 mr-1">Upload file</span>
+                <input #fileInput type="file" style="display:none" (change)="getfile($event.target.files)">
+            </button>
+                <!-- Create Folder button -->
+                <button
+                mat-flat-button
+                color="secondary"
+                (click)="openFolderDialog()">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2 mr-1">Create Folder</span>
+            </button>
+        </div>
+    </div>
+    <ng-container>
+        <!-- Items list -->
+        <ng-container
+            *ngIf="mediaItems && (mediaItems.folders.length > 0 || mediaItems.files.length > 0); else noItems">
+            <div #itemList class="p-6 space-y-8 md:p-8">
+                <!-- Folders -->
+                <ng-container *ngIf="mediaItems.folders.length > 0">
+                    <div>
+                        <div class="font-medium">Folders</div>
+                        <div
+                            class="flex flex-wrap mt-2 -m-2">
+                            <ng-container *ngFor="let folder of mediaItems.folders; trackBy:trackByFn">
+                                <div class="relative w-40 h-40 p-4 m-2 shadow rounded-2xl bg-card">
+                                    <ng-container *ngIf="!isRouterLink else isRouter" >
+                                        <a
+                                            class="absolute inset-0 z-10 flex flex-col p-4 cursor-pointer"
+                                            (click)="itemClick(folder)">
+                                            <div class="aspect-w-9 aspect-h-6">
+                                                <div class="flex items-center justify-center">
+                                                    <!-- Icon -->
+                                                    <mat-icon
+                                                        class="icon-size-14 text-hint"
+                                                        [svgIcon]="'iconsmind:folder'"></mat-icon>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col justify-center flex-auto text-sm font-medium text-center">
+                                                <div
+                                                    class="truncate"
+                                                    [matTooltip]="folder.name">{{folder.name}}
+                                                </div>
+                                            </div>
+                                        </a>
+                                        
+                                    </ng-container>
+                                    <ng-template #isRouter>
+                                        <a
+                                            class="absolute inset-0 z-10 flex flex-col p-4 cursor-pointer"
+                                            [routerLink]="['/file-manager/folders/', folder.id]">
+                                            <div class="aspect-w-9 aspect-h-6">
+                                                <div class="flex items-center justify-center">
+                                                    <!-- Icon -->
+                                                    <mat-icon
+                                                        class="icon-size-14 text-hint"
+                                                        [svgIcon]="'iconsmind:folder'"></mat-icon>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col justify-center flex-auto text-sm font-medium text-center">
+                                                <div
+                                                    class="truncate"
+                                                    [matTooltip]="folder.name">{{folder.name}}
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </ng-template>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </ng-container>
+                <!-- Files -->
+                <ng-container *ngIf="mediaItems.files.length > 0">
+                    <div>
+                        <div class="font-medium">Files</div>
+                        <div
+                            class="flex flex-wrap mt-2 -m-2">
+                            <ng-container *ngFor="let file of mediaItems.files; trackBy:trackByFn">
+                                <a
+                                    class="flex flex-col w-40 h-40 p-4 m-2 shadow cursor-pointer rounded-2xl bg-card"
+                                    (click)="selectFile(file)">
+                                    <div class="aspect-w-9 aspect-h-6">
+                                        <div class="flex items-center justify-center">
+                                            <div class="relative">
+                                                <img [src]="file.thumbnailUrl || file.azureUrl" alt="">
+                                                <div *ngIf="file.thumbnailUrl" 
+                                                    style="right: 45px; top: 25px;" 
+                                                    class="absolute">
+                                                    <mat-icon
+                                                        class="icon-size-8 text-hint"
+                                                        [svgIcon]="'iconsmind:play_music'">
+                                                    </mat-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col justify-center flex-auto text-sm font-medium text-center">
+                                        <div
+                                            class="truncate"
+                                            [matTooltip]="file.name">{{file.name}}</div>
+                                        <ng-container *ngIf="file.size">
+                                            <div class="truncate text-secondary">{{bytesToMiB(file.size)}}MiB</div>
+                                        </ng-container>
+                                    </div>
+                                </a>
+                            </ng-container>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+        <!-- No items template -->
+        <ng-template #noItems>
+            <div class="flex flex-col items-center justify-center flex-auto bg-gray-100 dark:bg-transparent">
+                <mat-icon
+                    class="icon-size-24"
+                    [svgIcon]="'iconsmind:file_hide'"></mat-icon>
+                <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no items!</div>
+            </div>
+        </ng-template>
+    </ng-container>
+</div>

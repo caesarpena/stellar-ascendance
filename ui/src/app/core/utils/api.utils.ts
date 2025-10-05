@@ -1,0 +1,116 @@
+export const API_UTILS = {
+  config: {
+    base: 'yourapiurl/api',
+    internalApp: {
+        getFitnessCategories:'/InternalApp/get-fitness-categories',
+        getFitnessSubCategoriesByCatId:'/InternalApp/get-fitness-sub-categories-by-catId',
+        getFitnessSubCategories:'/InternalApp/get-fitness-sub-categories',
+        getProgramLocationsByFitnessSubCatId:'/InternalApp/get-program-locations-by-fitness-subcat-id',
+        getTrainingEquipments:'/InternalApp/get-training-equipments',
+        getProgramLevels: '/InternalApp/get-program-levels',
+        bodyParts:'/InternalApp/get-body-parts',
+        muscleGroups:'/InternalApp/get-muscle-groups',
+        getCurrentUserWeightHistory:'/InternalApp/get-current-user-weight-history',
+        getCurrentUserLatestWeight:'/InternalApp/get-current-user-latest-weight',
+    },
+    auth: {
+      root: 'auth',
+      signIn: '/Account/token',
+      signUp: 'sign-up',
+      forgotPassword: 'forgot-password',
+      forgotPasswordEmailSent: 'forgot-password-email-sent',
+      passwordReset: 'password-reset',
+      passwordResetFailed: 'password-reset-failed',
+      passwordResetSucceeded: 'password-reset-succeeded',
+      registerMemberInternal: '/Account/register-member-internal',
+    },
+    settings: {
+      root: 'settings',
+      account: 'account',
+      appearance: 'appearance',
+      billing: 'billing',
+      blockedUsers: 'blocked-users',
+      notifications: 'notifications',
+      security: 'security',
+      securityLog: 'security-log',
+    },
+    mediaItems: {
+      createMediaItem: '/MediaItems/create-media-item',
+      getMediaItems: '/MediaItems/get-media-items',
+      getMediaItemById: '/MediaItems/get-media-item-by-id',
+      patchMediaItem: '/MediaItems/patch-media-item',
+      deleteMediaItem: '/MediaItems/delete-media-item',
+    },
+    uploadEncodeAndStreamFiles: {
+      uploadFile: '/UploadEncodeAndStreamFiles/upload-file',
+    },
+    account: {
+      userDetails: '/Account/user-details',
+      uploadUserProfile: '/Account/upload-user-profile',
+      uploadUserCover: '/Account/upload-user-cover',
+    },
+    user: {
+      getUserAddress: '/Users/get-user-address',
+      getGenders: '/Users/get-genders',
+    },
+    coachSubscribers: {
+        getCoachSubscribers: '/CoachSubscribers/get-coach-subscribers',
+        getSubscriberPrograms: '/CoachSubscribers/get-subscriber-programs',
+    },
+    programs: {
+        createProgram: '/Programs/create-program',
+        updateProgram: '/Programs/update-program',
+        getPrograms: '/Programs/get-programs',
+        getProgramById: '/Programs/get-program-by-id',
+        getProgramDetailsById: '/Programs/get-program-details-by-id',
+        deleteProgram: '/Programs/delete-program',
+        getProgramsSubscribers: '/Programs/get-programs-subscribers',
+        getProgramTrainingEquipments: '/Programs/get-program-training-equipments',
+        removeProgramSubscriber: '/Programs/remove-program-subscriber',
+        updateProgramSubscriberSchedule: '/Programs/remove-program-subscriber',
+
+    },
+    SubscribersPrograms: {
+      getSubscriberProgramById: '/SubscribersPrograms/get-subscriber-program-by-id',
+      addProgramSubscriber: '/SubscribersPrograms/add-program-subscriber',
+      updateProgramSubscriberSchedule: '/SubscribersPrograms/update-program-subscriber-schedule',
+      removeProgramSubscriber: '/SubscribersPrograms/remove-program-subscriber',
+  },
+    programRoutine: {
+        createProgramRoutine: '/ProgramRoutine/create-program-routine',
+        updateProgramRoutine: '/ProgramRoutine/update-program-routine',
+        getProgramRoutines: '/ProgramRoutine/get-program-routines',
+        getProgramRoutinesDetails: '/ProgramRoutine/get-program-routines-details',
+        deleteProgramRoutine: '/ProgramRoutine/delete-program-routine',
+    },
+    programItinerary: {
+      createProgramItineraryItem: '/ProgramItinerary/create-program-itinerary-item',
+      updateProgramItineraryItem: '/ProgramItinerary/update-program-itinerary-item',
+      updateProgramItineraryOrder: '/ProgramItinerary/update-program-itinerary-Order',
+      getProgramItinerary: '/ProgramItinerary/get-program-itinerary',
+      deleteProgramItineraryItem: '/ProgramItinerary/delete-program-itinerary-item',
+    },
+    programItineraryRoutine: {
+      createProgramItineraryItemRoutines: '/ProgramItineraryRoutine/create-program-itinerary-item-routines',
+      getProgramItineraryItemRoutines: '/ProgramItineraryRoutine/get-program-itinerary-item-routines',
+      updateProgramItineraryItemRoutinesOrder: '/ProgramItineraryRoutine/update-program-itinerary-item-routines-order',
+      deleteProgramItineraryItemRoutine: '/ProgramItineraryRoutine/delete-program-itinerary-item-routine',
+    },
+    routineSession: {
+        deleteSession:'/RoutineSession/delete-session',
+        getSessions: '/RoutineSession/get-sessions',
+    },
+    routineSessionExercise: {
+      createSessionExercise: '/RoutineSessionExercise/create-session-exercise',
+      updateSessionExercise:'/RoutineSessionExercise/update-session-exercise',
+      getExerciseMuscleGroups:'/RoutineSessionExercise/get-muscle-groups'
+  },
+    exerciseSet: {
+        updateExerciseSets: '/ExerciseSet/update-exercise-sets',
+        getExerciseSets: '/ExerciseSet/get-exercise-sets',
+    },
+    errorResponse: {
+      notFound: '404',
+    },
+  },
+};

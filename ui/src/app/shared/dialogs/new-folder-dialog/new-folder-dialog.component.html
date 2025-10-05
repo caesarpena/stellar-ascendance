@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>New Folder</h2>
+<mat-dialog-content class="mat-typography">
+  <form
+    class="mt-8"
+    [formGroup]="newFolderForm"
+    #newFolderNgForm="ngForm">
+    <mat-form-field class="w-full"> 
+      <input
+          id=""
+          matInput
+          [formControlName]="'folderName'"> 
+      <mat-error *ngIf="newFolderForm.get('folderName').hasError('required')">
+          Folder name is required
+      </mat-error>
+      <mat-error *ngIf="newFolderForm.get('folderName').hasError('folderName')">
+          Folder name already exist
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="newFolderForm" cdkFocusInitial>Create</button>
+</mat-dialog-actions>

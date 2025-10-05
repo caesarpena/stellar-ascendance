@@ -1,0 +1,17 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+.mat-icon-size-16 {
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.mat-icon-size-20 {
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}

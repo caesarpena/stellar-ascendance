@@ -1,0 +1,161 @@
+<div class="flex flex-col flex-auto p-6 md:p-8 container__mediaItem-details">
+    <form [formGroup]="mediaItemForm"
+        #mediaItemNgForm="ngForm">
+        <!-- Close button -->
+        <div class="flex items-center justify-end">
+            <button
+                mat-icon-button
+                [routerLink]="['../../']">
+                <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </button>
+        </div>
+
+        <!-- Preview -->
+        <div class="mt-8 aspect-w-9 aspect-h-6">
+            <div class="flex items-center justify-center border rounded-lg bg-gray-50 dark:bg-card">
+                <ng-container *ngIf="mediaItem.type === 'folder'">
+                    <mat-icon
+                        class="icon-size-14 text-hint"
+                        [svgIcon]="'iconsmind:folder'"></mat-icon>
+                </ng-container>
+                <ng-container *ngIf="mediaItem.type !== 'folder'">
+                    <img *ngIf="!mediaItem.thumbnailUrl" [src]="mediaItem.azureUrl" alt="">
+                    <button
+                        *ngIf="mediaItem.thumbnailUrl"
+                        class="w-full h-full"
+                        (click)="openMediaPlayerDialog()">
+                        <img [src]="mediaItem.thumbnailUrl || mediaItem.azureUrl" alt="">
+                        <div class="absolute top-1/2 right-1/2">
+                        <mat-icon
+                            class="icon-size-14 text-hint"
+                            [svgIcon]="'iconsmind:play_music'">
+                        </mat-icon>
+                        </div>
+                    </button>
+                </ng-container>
+ 
+            </div>
+        </div>
+
+        <!-- Name & Type -->
+        <div class="flex flex-col items-start mt-8">
+            <div class="flex items-center justify-between flex-1 w-full">
+                <div *ngIf="!isEditMode" class="text-xl font-medium">{{mediaItem.name}}</div>
+                <ng-container *ngIf="isEditMode">
+                    <mat-form-field class="w-full">
+                        <input
+                            id=""
+                            matInput
+                            formControlName="name">
+                        <mat-error *ngIf="mediaItemForm.get('name').hasError('required')">
+                            Name is required
+                        </mat-error>
+                        <mat-error *ngIf="mediaItemForm.get('name').hasError('name')">
+                            Name already exist
+                        </mat-error>
+                    </mat-form-field>
+                </ng-container>
+                <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="moreMenu">
+                    <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                </button>
+                <mat-menu #moreMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        (click)="startEditMode()">
+                        <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        <span>Edit</span>
+                    </button>
+                    <button *ngIf="mediaItem.type !== 'folder'" mat-menu-item>
+                        <mat-icon [svgIcon]="'heroicons_solid:download'"></mat-icon>
+                        <span>Download</span>
+                    </button>
+                    <button mat-menu-item
+                        (click)="deleteMediaItemDialog(mediaItem)">
+                        <mat-icon [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                        <span>Delete</span>
+                    </button>
+                </mat-menu>
+            </div>
+
+            <div *ngIf="mediaItem.type === 'folder'"
+                class="mt-1 mb-2 px-1.5 rounded text-sm font-semibold leading-5 text-white"
+                [class.bg-indigo-600]="mediaItem.type === 'folder'">
+                {{mediaItem.type.toUpperCase()}}
+            </div>
+            <div *ngIf="mediaItem.type !== 'folder'"
+                class="mt-1 mb-2 px-1.5 rounded text-sm font-semibold leading-5 text-white"
+                [class.bg-amber-600]="mediaItem.type !== 'folder'">
+                {{mediaItem.mediaType.toUpperCase()}}
+            </div>
+        </div>
+
+        <!-- Information -->
+        <div class="mt-8 text-lg font-medium">Information</div>
+        <div class="flex flex-col mt-4 font-medium border-t border-b divide-y">
+            <div class="flex items-center justify-between py-3">
+                <div class="text-secondary">Uploaded By</div>
+                <div>{{mediaItem.createdBy}}</div>
+            </div>
+            <div class="flex items-center justify-between py-3">
+                <div class="text-secondary">Uploaded At</div>
+                <div>{{mediaItem.createdAt}}</div>
+            </div>
+            <div class="flex items-center justify-between py-3">
+                <div class="text-secondary">Modified At</div>
+                <div>{{mediaItem.modifiedAt}}</div>
+            </div>
+            <div class="flex items-center justify-between py-3">
+                <div class="text-secondary">Size</div>
+                <div>{{bytesToMiB(mediaItem.size)}} MIB</div>
+            </div>
+        </div>
+
+        <!-- Description -->
+
+        <div class="flex items-center justify-between mt-8">
+            <div class="text-lg font-medium">Description</div>
+        </div>
+        <div class="w-full mt-2 border-t">
+            <div class="py-3">
+                <ng-container *ngIf="mediaItem.description">
+                    <div>{{mediaItem.description}}</div>
+                </ng-container>
+                <ng-container *ngIf="!mediaItem.description && !isEditMode">
+                    <div class="italic text-secondary">Start editing to add a description</div>
+                </ng-container>
+                <ng-container *ngIf="isEditMode">
+                    <mat-form-field class="w-full">
+                        <textarea
+                            matInput
+                            formControlName="description"
+                            [spellcheck]="false"
+                            matTextareaAutosize>
+                        </textarea>
+                    </mat-form-field>
+                </ng-container>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end gap-2 mt-8">
+            <button
+                class="flex-auto"
+                mat-stroked-button
+                color="warn"
+                (click)="stopEditMode()"
+                [disabled]="!isEditMode">
+                Cancel
+            </button>
+            <button
+                class="flex-auto"
+                mat-flat-button
+                color="primary"
+                [disabled]="isSaveDisabled()"
+                (click)="saveMediaItem(mediaItem)">
+                Save
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,180 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">
+    <!-- Main -->
+    <div class="flex flex-col flex-auto">
+        <!-- Header -->
+        <div class="flex flex-col items-start p-6 border-b sm:flex-row sm:items-center sm:justify-between sm:py-12 md:px-8 bg-card dark:bg-transparent">
+            <!-- Title -->
+            <div>
+                <div class="text-4xl font-extrabold leading-none tracking-tight">File Manager</div>
+                <div class="flex items-center mt-0.5 font-medium text-secondary">
+                    <ng-container *ngIf="!mediaItems?.path?.length">
+                        {{mediaItems?.folders?.length}} folders, {{mediaItems?.files?.length}} files
+                    </ng-container>
+                    <!-- Breadcrumbs -->
+                    <ng-container *ngIf="mediaItems?.path?.length">
+                        <div class="flex items-center space-x-2">
+                            <a
+                                class="cursor-pointer text-primary"
+                                [routerLink]="['/file-manager']">Home
+                            </a>
+                            <div class="">/</div>
+                            <ng-container *ngFor="let path of mediaItems.path; let last = last; trackBy: trackByFn">
+                                <ng-container *ngIf="!last">
+                                    <a
+                                        class="cursor-pointer text-primary"
+                                        [routerLink]="['/file-manager/folders/', path.id]">{{path.name}}</a>
+                                </ng-container>
+                                <ng-container *ngIf="last">
+                                    <div>{{path.name}}</div>
+                                </ng-container>
+                                <ng-container *ngIf="!last">
+                                    <div class="">/</div>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="mt-4 sm:mt-0">
+                <!-- Upload button -->
+                <button
+                    mat-flat-button
+                    color="primary"
+                    (click)="openFileDialog()">
+                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                    <span class="ml-2 mr-1">Upload file</span>
+                    <input type="file" style="display:none" (change)="getfile($event.target.files)">
+                </button>
+                 <!-- Create Folder button -->
+                 <button
+                    mat-flat-button
+                    color="secondary"
+                    (click)="openFolderDialog()">
+                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                    <span class="ml-2 mr-1">Create Folder</span>
+                </button>
+            </div>
+        </div>
+        <ng-container
+            [contextMenu]="basicMenu"
+            [contextMenuSubject]="itemList">
+            <!-- Items list -->
+            <ng-container
+                *ngIf="mediaItems && (mediaItems.folders.length > 0 || mediaItems.files.length > 0); else noItems">
+                <div #itemList class="p-6 space-y-8 md:p-8">
+                    <!-- Folders -->
+                    <ng-container *ngIf="mediaItems?.folders?.length > 0">
+                        <div>
+                            <div class="font-medium">Folders</div>
+                            <div
+                                class="flex flex-wrap mt-2 -m-2">
+                                <ng-container *ngFor="let folder of mediaItems.folders; trackBy:trackByFn">
+                                    <div class="relative w-40 h-40 p-4 m-2 shadow rounded-2xl bg-card">
+                                        <a
+                                            class="absolute z-20 top-1.5 right-1.5 w-8 h-8 min-h-8"
+                                            (click)="$event.preventDefault();"
+                                            [routerLink]="['./details/', folder.id]"
+                                            mat-icon-button>
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
+                                        </a>
+                                        <a
+                                            class="absolute inset-0 z-10 flex flex-col p-4 cursor-pointer"
+                                            [routerLink]="['/file-manager/folders/', folder.id]">
+                                            <div class="aspect-w-9 aspect-h-6">
+                                                <div class="flex items-center justify-center">
+                                                    <!-- Icon -->
+                                                    <mat-icon
+                                                        class="icon-size-14 text-hint"
+                                                        [svgIcon]="'iconsmind:folder'"></mat-icon>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col justify-center flex-auto text-sm font-medium text-center">
+                                                <div
+                                                    class="truncate"
+                                                    [matTooltip]="folder.name">{{folder.name}}
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Files -->
+                    <ng-container *ngIf="mediaItems?.files?.length > 0">
+                        <div>
+                            <div class="font-medium">Files</div>
+                            <div
+                                class="flex flex-wrap mt-2 -m-2">
+                                <ng-container *ngFor="let file of mediaItems.files; trackBy:trackByFn">
+                                    <a
+                                        class="flex flex-col w-40 h-40 p-4 m-2 shadow cursor-pointer rounded-2xl bg-card"
+                                         [routerLink]="['./details/', file.id]">
+                                        <div class="aspect-w-9 aspect-h-6">
+                                            <div class="flex items-center justify-center">
+                                                <div class="relative">
+                                                    <img [src]="file.thumbnailUrl || file.azureUrl" alt="">
+                                                    <div *ngIf="file.thumbnailUrl" 
+                                                        style="right: 45px; top: 25px;" 
+                                                        class="absolute">
+                                                        <mat-icon
+                                                            class="icon-size-8 text-hint"
+                                                            [svgIcon]="'iconsmind:play_music'">
+                                                        </mat-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col justify-center flex-auto text-sm font-medium text-center">
+                                            <div
+                                                class="truncate"
+                                                [matTooltip]="file.name">{{file.name}}</div>
+                                            <ng-container *ngIf="file.size">
+                                                <div class="truncate text-secondary">{{bytesToMiB(file.size)}}MiB</div>
+                                            </ng-container>
+                                        </div>
+                                    </a>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+            <!-- No items template -->
+            <ng-template #noItems
+                [contextMenu]="basicMenu"
+                [contextMenuSubject]="itemList">
+                <div class="flex flex-col items-center justify-center flex-auto bg-gray-100 dark:bg-transparent">
+                    <mat-icon
+                        class="icon-size-24"
+                        [svgIcon]="'iconsmind:file_hide'"></mat-icon>
+                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no files!</div>
+                </div>
+            </ng-template>
+        </ng-container>
+    </div>
+</div>
+
+<context-menu>
+    <ng-template contextMenuItem (execute)="openFolderDialog()">
+        <div>
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+            <span>New Folder</span>
+        </div>
+    </ng-template>
+    <ng-template contextMenuItem divider="true"></ng-template>
+    <ng-template contextMenuItem (execute)="openFileDialog()">
+        <div>
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+            <span>Upload File</span>
+            <input type="file" style="display:none" (change)="getfile($event.target.files)">
+        </div>
+    </ng-template>
+    <!-- <ng-template contextMenuItem passive="true">
+        Input something: <input type="text">
+    </ng-template> -->
+</context-menu>

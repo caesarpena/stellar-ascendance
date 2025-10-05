@@ -1,0 +1,118 @@
+@import './button-reset.scss';
+
+:root {
+  // Styling of the element where a context menu can appear
+  --ngx-contextmenu-focusable-border-bottom: 1px dotted #70757e;
+
+  // Styling of the context menu itself
+  --ngx-contextmenu-font-family: sans-serif;
+  --ngx-contextmenu-background-color: white;
+  --ngx-contextmenu-border-radius: 4px;
+  --ngx-contextmenu-border: 1px solid rgba(0, 0, 0, 0.18);
+  --ngx-contextmenu-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+  --ngx-contextmenu-font-size: 14px;
+  --ngx-contextmenu-margin: 2px 0 0;
+  --ngx-contextmenu-min-width: 160px;
+  --ngx-contextmenu-outline: 1px solid #70757e;
+  --ngx-contextmenu-padding: 5px 0;
+  --ngx-contextmenu-text-color: #70757e;
+  --ngx-contextmenu-text-disabled-color: #8a909a;
+
+  // Styling of context menu items
+  --ngx-contextmenu-item-arrow-left: '◀';
+  --ngx-contextmenu-item-arrow-right: '▶';
+  --ngx-contextmenu-item-background-hover-color: #f8f8f8;
+  --ngx-contextmenu-item-separator-color: #8a909a;
+  --ngx-contextmenu-item-separator-padding: 10px;
+  --ngx-contextmenu-item-separator-width: 96%;
+  --ngx-contextmenu-item-padding: 6px 20px;
+  --ngx-contextmenu-item-text-hover-color: #5a6473;
+}
+
+context-menu-content {
+  &:focus-visible {
+    outline: var(--ngx-contextmenu-outline);
+  }
+
+  .ngx-contextmenu {
+    font-family: var(--ngx-contextmenu-font-family);
+
+    ul.ngx-contextmenu--dropdown-menu {
+      list-style: none;
+      outline: none;
+
+      background-color: var(--ngx-contextmenu-background-color);
+      color: var(--ngx-contextmenu-text-color);
+      min-width: var(--ngx-contextmenu-min-width);
+      padding: var(--ngx-contextmenu-padding);
+      margin: var(--ngx-contextmenu-margin);
+      font-size: var(--ngx-contextmenu-font-size);
+      text-align: start;
+      background-clip: padding-box;
+      border: var(--ngx-contextmenu-border);
+      border-radius: var(--ngx-contextmenu-border-radius);
+      box-shadow: var(--ngx-contextmenu-box-shadow);
+
+      .ngx-contextmenu--parent-menu:after {
+        content: var(--ngx-contextmenu-item-arrow-right);
+      }
+
+      > li {
+        display: flex;
+
+        &:not([role='separator']) > * {
+          flex: 1 1 auto;
+        }
+
+        > [role='separator'] {
+          border-width: 0 0 1px 0;
+          border-bottom: 1px solid var(--ngx-contextmenu-item-separator-color);
+          margin: var(--ngx-contextmenu-item-separator-padding) 2%;
+          width: var(--ngx-contextmenu-item-separator-width);
+        }
+
+        > [role='menuitem'] {
+          padding: var(--ngx-contextmenu-item-padding);
+        }
+
+        > [role='menuitem'] {
+          outline: none;
+          color: var(--ngx-contextmenu-text-color);
+          display: inline-flex;
+          flex-direction: row;
+          justify-content: space-between;
+          text-decoration: none;
+          white-space: nowrap;
+
+          &:not(.disabled):not(.ngx-contextmenu--item-content-passive) {
+            &:hover,
+            &.active {
+              text-decoration: none;
+              background-color: var(
+                --ngx-contextmenu-item-background-hover-color
+              );
+              color: var(--ngx-contextmenu-item-text-hover-color);
+            }
+          }
+
+          &.disabled {
+            cursor: default;
+            &,
+            &:hover,
+            &.active {
+              color: var(--ngx-contextmenu-text-disabled-color);
+            }
+          }
+        }
+      }
+    }
+
+    &[dir='rtl'] {
+      ul.ngx-contextmenu--dropdown-menu {
+        .ngx-contextmenu--parent-menu:after {
+          content: var(--ngx-contextmenu-item-arrow-left);
+        }
+      }
+    }
+  }
+}

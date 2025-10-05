@@ -1,0 +1,119 @@
+<div class="flex flex-col items-center flex-auto min-w-0 sm:flex-row md:items-start sm:justify-center md:justify-start">
+    <div class="w-full px-4 py-8 md:flex md:items-center md:justify-end sm:w-auto md:h-full md:w-1/2 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+        <div class="w-full mx-auto max-w-80 sm:w-80 sm:mx-0">
+            <!-- Logo -->
+            <div class="w-12">
+                <img src="assets/images/logo/caesarpena-logo.png">
+            </div>
+
+            <!-- Title -->
+            <div class="mt-8 text-4xl font-extrabold leading-tight tracking-tight">Sign in</div>
+
+            <!-- Alert -->
+            <fuse-alert
+                class="mt-8 -mb-4"
+                *ngIf="showAlert"
+                [appearance]="'outline'"
+                [showIcon]="false"
+                [type]="alert.type"
+                [@shake]="alert.type === 'error'">
+                {{alert.message}}
+            </fuse-alert>
+
+            <!-- Sign in form -->
+            <form
+                class="mt-8"
+                [formGroup]="signInForm"
+                #signInNgForm="ngForm">
+
+                <!-- Email field -->
+                <mat-form-field class="w-full">
+                    <mat-label>Email address</mat-label>
+                    <input
+                        id="email"
+                        matInput
+                        [formControlName]="'email'">
+                    <mat-error *ngIf="signInForm.get('email').hasError('required')">
+                        Email address is required
+                    </mat-error>
+                    <mat-error *ngIf="signInForm.get('email').hasError('email')">
+                        Please enter a valid email address
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Password field -->
+                <mat-form-field class="w-full">
+                    <mat-label>Password</mat-label>
+                    <input
+                        id="password"
+                        matInput
+                        type="password"
+                        [formControlName]="'password'"
+                        #passwordField>
+                    <button
+                        mat-icon-button
+                        type="button"
+                        (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                        matSuffix>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                    </button>
+                    <mat-error>
+                        Password is required
+                    </mat-error>
+                </mat-form-field>
+
+
+                <!-- Submit button -->
+                <button
+                    class="w-full mt-6 fuse-mat-button-large"
+                    mat-flat-button
+                    [color]="'primary'"
+                    [disabled]="signInForm.disabled"
+                    (click)="signIn()">
+                    <span *ngIf="!signInForm.disabled">
+                        Sign in
+                    </span>
+                    <mat-progress-spinner
+                        *ngIf="signInForm.disabled"
+                        [diameter]="24"
+                        [mode]="'indeterminate'"></mat-progress-spinner>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="relative items-center justify-center flex-auto hidden w-1/2 h-full p-16 overflow-hidden bg-gray-800 md:flex lg:px-28 dark:border-l">
+        <!-- Background - @formatter:off -->
+        <!-- Rings -->
+        <svg class="absolute inset-0 pointer-events-none"
+             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
+                <circle r="234" cx="196" cy="23"></circle>
+                <circle r="234" cx="790" cy="491"></circle>
+            </g>
+        </svg>
+        <!-- @formatter:on -->
+        <!-- Content -->
+        <div class="relative z-10 w-full max-w-2xl">
+            <div class="font-bold leading-none text-gray-100 text-7xl">
+                <div>Welcome to</div>
+                <div>File Manager</div>
+            </div>
+            <div class="mt-6 text-lg leading-6 tracking-tight text-gray-100">
+                Thanks for stopping by! You’re about to explore a demo project by Cesar Pena. Got feedback? Reach me at 
+                <a
+                href="mailto:cesar_raynell@hotmail.com"
+                class="text-blue-200 underline underline-offset-2 hover:text-blue-700 hover:decoration-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm dark:text-blue-400 dark:hover:text-blue-300">
+                cesar_raynell@hotmail.com
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>

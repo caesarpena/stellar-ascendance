@@ -57,7 +57,7 @@
         <!-- Items list -->
         <ng-container
             *ngIf="mediaItems && (mediaItems.folders.length > 0 || mediaItems.files.length > 0); else noItems">
-            <div #itemList class="p-6 space-y-8 md:p-8">
+            <div #itemList class="p-6 md:p-8 flex-1 min-h-0 overflow-y-auto">
                 <!-- Folders -->
                 <ng-container *ngIf="mediaItems.folders.length > 0">
                     <div>

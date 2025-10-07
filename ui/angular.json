@@ -100,10 +100,10 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                            "browserTarget": "fuse:build:production"
+                            "browserTarget": "stellar-ascendance-ui:build:production"
                         },
                         "development": {
-                            "browserTarget": "fuse:build:development"
+                            "browserTarget": "stellar-ascendance-ui:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -111,7 +111,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "fuse:build"
+                        "browserTarget": "stellar-ascendance-ui:build"
                     }
                 },
                 "test": {
@@ -145,5 +145,5 @@
             }
         }
     },
-    "defaultProject": "fuse"
+    "defaultProject": "stellar-ascendance-ui"
 }

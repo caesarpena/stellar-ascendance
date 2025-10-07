@@ -1,7 +1,7 @@
 {
-  "name": "@fuse/starter",
+  "name": "stellar-ascendance-ui",
   "version": "14.1.1",
-  "description": "Fuse - Angular Admin Template and Starter Project",
+  "description": "stellar-ascendance-ui - ",
   "author": "https://themeforest.net/user/srcn",
   "license": "https://themeforest.net/licenses/standard",
   "private": true,

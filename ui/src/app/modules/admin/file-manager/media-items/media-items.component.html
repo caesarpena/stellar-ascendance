@@ -1,8 +1,8 @@
-<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden min-h-0">
     <!-- Main -->
-    <div class="flex flex-col flex-auto">
+    <div class="flex flex-col flex-auto min-h-0">
         <!-- Header -->
-        <div class="flex flex-col items-start p-6 border-b sm:flex-row sm:items-center sm:justify-between sm:py-12 md:px-8 bg-card dark:bg-transparent">
+        <div class="flex flex-col items-start p-6 border-b sm:flex-row sm:items-center sm:justify-between sm:py-12 md:px-8 bg-card dark:bg-transparent shrink-0">
             <!-- Title -->
             <div>
                 <div class="text-4xl font-extrabold leading-none tracking-tight">File Manager</div>
@@ -62,7 +62,7 @@
             <!-- Items list -->
             <ng-container
                 *ngIf="mediaItems && (mediaItems.folders.length > 0 || mediaItems.files.length > 0); else noItems">
-                <div #itemList class="p-6 space-y-8 md:p-8">
+                <div #itemList class="p-6 md:p-8 flex-1 min-h-0 overflow-y-auto overscroll-contain">
                     <!-- Folders -->
                     <ng-container *ngIf="mediaItems?.folders?.length > 0">
                         <div>

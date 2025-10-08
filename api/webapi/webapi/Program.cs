@@ -127,6 +127,15 @@ app.MapControllers();
 // Health endpoint for probes/warmup
 app.MapGet("/healthz", () => Results.Ok("ok"));
 
-// Bind to all interfaces on the expected port
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Run($"http://0.0.0.0:{port}");
+if (app.Environment.IsDevelopment())
+{
+    // Respect launchSettings.json (applicationUrl) during local debug
+    app.Run(); // will pick up http://localhost:7072 from launchSettings
+}
+else
+{
+    // Bind to all interfaces on the expected port in containers/cloud
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    app.Run($"http://0.0.0.0:{port}");
+}
+

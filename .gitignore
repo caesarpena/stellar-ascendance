@@ -1,0 +1,55 @@
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---- IDEs ----
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ---- .NET / Visual Studio / Azure Functions ----
+**/bin/
+**/obj/
+**/.vs/
+**/Debug/
+**/Release/
+**/TestResults/
+**/GeneratedMSBuildEditorConfig.editorconfig
+
+# NuGet + design-time build cache files (usually under obj/)
+**/*.nuget.cache
+**/*.nuget.dgspec.json
+**/*.nuget.g.props
+**/*.nuget.g.targets
+**/*.assets.cache
+**/*AssemblyInfo*.cs
+**/*AssemblyInfoInputs.cache
+**/*.StaticWebAssets.xml
+**/*.g.cs
+**/*.g.i.cs
+
+# VS database/caches you’re seeing in the screenshot
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.dtbcache*
+**/*.tlog
+**/*.cache
+**/*.log
+
+# Azure Functions local secrets
+**/local.settings.json
+
+# ---- Node / Angular (ui/) ----
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*

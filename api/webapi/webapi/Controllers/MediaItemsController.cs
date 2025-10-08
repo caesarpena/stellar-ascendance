@@ -21,7 +21,7 @@ namespace webapi.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         public MediaItemsController(MediaItemsContext mediaITemsDb,
-            UserManager<ApplicationUser> userManager, 
+            UserManager<ApplicationUser> userManager,
             IBlobService blobService)
 
         {
@@ -160,16 +160,16 @@ namespace webapi.Controllers
 
             // Start traversing and storing the folders as a path array
             // until we hit null on the folder id
-           
+
             while (!String.IsNullOrEmpty(currentFolder?.folderId))
             {
-                    currentFolder = Array.Find(pathItems, item => item.Id == currentFolder.folderId);
+                currentFolder = Array.Find(pathItems, item => item.Id == currentFolder.folderId);
 
-                    if (currentFolder != null)
-                    {
-                        path.Add(currentFolder);
-                    }
-                   
+                if (currentFolder != null)
+                {
+                    path.Add(currentFolder);
+                }
+
             }
 
             path.Reverse();
@@ -206,7 +206,7 @@ namespace webapi.Controllers
             }
             MediaItem[] mediaItemChilds = _mediaITemsDb.MediaItems.Where(s => s.folderId == model.Id || s.folderId == null).ToArray();
             MediaItem result = _mediaITemsDb.MediaItems.Where(s => s.Id == model.Id).FirstOrDefault();
-            
+
             if (result == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
@@ -214,11 +214,11 @@ namespace webapi.Controllers
             }
             //check if another media item has the same name at the specified directory
             bool nameExist = Array.Exists(mediaItemChilds, element => element.name == model.name);
-            
+
             if (nameExist && result.name != model.name)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { Status = "Error", Message = "The name "+ model.name+" already exist in directory" });
+                    new { Status = "Error", Message = "The name " + model.name + " already exist in directory" });
             }
             if (result.name != model.name)
             {
@@ -254,83 +254,79 @@ namespace webapi.Controllers
         /// and delete the entry and all its childs from the database
         /// a trigger was defined in the db to excute "instead delete" with logic to perform the action above
         /// </summary>
+        /// 
         [Authorize]
         [HttpDelete("delete-media-item")]
         public async Task<ActionResult> DeleteMediaItem(string? id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest(new { Status = "Error", Message = "Missing Id." });
+
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
+
             var claimsIdentity = User.Identity as ClaimsIdentity;
             var currentUser = await _userManager.FindByEmailAsync(claimsIdentity?.Name);
-            MediaItem? file = _mediaITemsDb?.MediaItems.Where(s => s.Id == id).FirstOrDefault();
+            if (currentUser == null)
+                return Unauthorized(new { Status = "Error", Message = "User not found." });
 
-            if (file != null)
+            var item = await _mediaITemsDb.MediaItems.FirstOrDefaultAsync(s => s.Id == id);
+            if (item == null || !string.Equals(item.userId, currentUser.Id, StringComparison.OrdinalIgnoreCase))
+                return NotFound(new { Status = "Error", Message = $"Media item '{id}' not found." });
+
+            var container = GetContainerNameForUser(currentUser.Id);
+
+            // FILE: delete blob (+thumbnail) then DB row
+            if (string.Equals(item.type, "file", StringComparison.OrdinalIgnoreCase))
             {
+                var del = await DeleteFileAndThumbnailAsync(container, item);
+                if (del.Status == "Error")
+                    return StatusCode(StatusCodes.Status500InternalServerError, del);
+
+                _mediaITemsDb.MediaItems.Remove(item);
+                await _mediaITemsDb.SaveChangesAsync();
+                return NoContent();
+            }
+
+            // FOLDER: gather descendants, delete blobs for file descendants, then delete rows
+            if (string.Equals(item.type, "folder", StringComparison.OrdinalIgnoreCase))
+            {
+                //Compute subtree BEFORE DB changes (so we know which blobs to remove)
+                var descendants = await GetDescendantsAsync(currentUser.Id, item.Id);
+                var fileDescendants = descendants.Where(d => string.Equals(d.type, "file", StringComparison.OrdinalIgnoreCase)).ToList();
+
+                //Delete all file blobs (+thumbnails). Fail fast if any deletion errors.
+                foreach (var f in fileDescendants)
+                {
+                    var del = await DeleteFileAndThumbnailAsync(container, f);
+                    if (del.Status == "Error")
+                        return StatusCode(StatusCodes.Status500InternalServerError,
+                            new { Status = "Error", Message = $"Blob delete failed for '{f.name}': {del.Message}" });
+                }
+                using var tx = await _mediaITemsDb.Database.BeginTransactionAsync();
                 try
                 {
-                    
-                    FileOperationResult azResult = await DeleteFile(currentUser.Id, file);
+                    // I have a DB trigger cascades (media_asset_parent_deleted), so delete the folder only
+                    _mediaITemsDb.MediaItems.Remove(item);
 
-                    if (azResult.Status == "Error")
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError,
-                        new { Status = "Error", Message = $"Can not delete {file.name}" });
-                    }
-
-                    _mediaITemsDb?.MediaItems.Remove(file);
-
-                    if (_mediaITemsDb != null)
-                    {
-                        await _mediaITemsDb.SaveChangesAsync();
-                    }
+                    await _mediaITemsDb.SaveChangesAsync();
+                    await tx.CommitAsync();
                 }
                 catch (Exception ex)
                 {
+                    await tx.RollbackAsync();
                     return StatusCode(StatusCodes.Status500InternalServerError,
                         new { Status = "Error", Message = ex.Message });
                 }
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                new { Status = "Error", Message = $"Can not find file {file.name}" });
+
+                return NoContent();
             }
 
-            return Ok(StatusCodes.Status200OK);
+            // Unknown type
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { Status = "Error", Message = $"Unsupported media item type '{item.type}'." });
         }
 
-/*
-        [Authorize]
-        [HttpDelete("delete-thumbnail")]
-        public async Task<ActionResult> DeleteThumbnail(string? fileName) 
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            var currentUser = await _userManager.FindByEmailAsync(claimsIdentity?.Name);
-
-            try
-            {
-                FileOperationResult azResult = await DeleteFile(currentUser.Id, fileName);
-
-                if (azResult.Status == "Error")
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { Status = "Error", Message = $"Can not delete {fileName}" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { Status = "Error", Message = ex.Message });
-            }
-
-            return Ok(StatusCodes.Status200OK);
-        }*/
 
         private async Task<FileOperationResult> DeleteFile(string currentUserId, MediaItem file)
         {
@@ -381,5 +377,91 @@ namespace webapi.Controllers
             var videoExtensions = new[] { ".mp4", ".avi", ".mkv", ".mov", /* add more extensions if needed */ };
             return videoExtensions.Any(ext => fileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
         }
+
+
+        private string GetContainerNameForUser(string userId) => $"input-{userId}";
+
+        private static string? TryGetBlobNameFromUrl(string? url, string containerName)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return null;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return null;
+
+            // AbsolutePath like: /input-<userid>/thumbnails/file_thumb.png
+            var path = uri.AbsolutePath.TrimStart('/'); // input-<userid>/thumbnails/...
+            if (path.StartsWith(containerName + "/", StringComparison.OrdinalIgnoreCase))
+                return path.Substring(containerName.Length + 1); // thumbnails/file_thumb.png
+
+            // Fallback: use whatever after leading slash
+            return path;
+        }
+
+        private async Task<List<MediaItem>> GetDescendantsAsync(string userId, string rootFolderId)
+        {
+            // Load all items for this user once; traverse in memory
+            var all = await _mediaITemsDb.MediaItems
+                .Where(m => m.userId == userId)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var childrenByParent = all
+                .Where(x => !string.IsNullOrEmpty(x.folderId))
+                .GroupBy(x => x.folderId!)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var stack = new Stack<string>();
+            stack.Push(rootFolderId);
+
+            var result = new List<MediaItem>();
+
+            while (stack.Count > 0)
+            {
+                var parentId = stack.Pop();
+                if (!childrenByParent.TryGetValue(parentId, out var kids)) continue;
+
+                foreach (var child in kids)
+                {
+                    result.Add(child);
+                    if (string.Equals(child.type, "folder", StringComparison.OrdinalIgnoreCase))
+                        stack.Push(child.Id);
+                }
+            }
+
+            return result;
+        }
+
+        private async Task<FileOperationResult> DeleteFileAndThumbnailAsync(string containerName, MediaItem file)
+        {
+            try
+            {
+                // MAIN FILE
+                // Prefer azureUrl parsing; fallback to file.name
+                var fileBlobName = TryGetBlobNameFromUrl(file.azureUrl, containerName) ?? file.name;
+                if (string.IsNullOrWhiteSpace(fileBlobName))
+                    return new FileOperationResult { Status = "Error", Message = $"No blob name for file '{file.name}'." };
+
+                var mainDeleted = await _blobService.DeleteBlobIfExistsAsync(containerName, fileBlobName);
+                if (!mainDeleted)
+                    return new FileOperationResult { Status = "Error", Message = $"Main blob for '{file.name}' not found." };
+
+                // THUMBNAIL (if any)
+                if (!string.IsNullOrWhiteSpace(file.ThumbnailUrl))
+                {
+                    var thumbBlobName = TryGetBlobNameFromUrl(file.ThumbnailUrl, containerName);
+                    if (!string.IsNullOrWhiteSpace(thumbBlobName))
+                    {
+                        // best-effort: if not found, don't fail the whole op
+                        await _blobService.DeleteBlobIfExistsAsync(containerName, thumbBlobName);
+                    }
+                }
+
+                return new FileOperationResult { Status = "Success", Message = $"Deleted '{file.name}' (+ thumbnail if present)." };
+            }
+            catch (Exception ex)
+            {
+                return new FileOperationResult { Status = "Error", Message = ex.Message };
+            }
+        }
+
+
     }
 }
